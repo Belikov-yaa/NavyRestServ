@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  postgres:
+    container_name: db_navy
+    image: postgres:14.2
+    environment:
+      - POSTGRES_DB=navy
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5430:5432
+    networks:
+      - navy-net
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-U", "postgres" ]
+      interval: 5s
+      timeout: 1s
+      retries: 2
+
+  rest-api:
+    container_name: rest-api
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres/navy
+    ports:
+      - 6080:8080
+    depends_on:
+      - flyway
+    networks:
+      - navy-net
+#    restart: unless-stopped
+
+
+  flyway:
+    container_name: flyway_cont
+    image: flyway/flyway
+    command:
+      -url=jdbc:postgresql://postgres:5432/navy -schemas=public -user=postgres -password=postgres -connectRetries=30 migrate
+    volumes:
+      - ./src/main/resources/db:/flyway/sql
+    depends_on:
+      - postgres
+    networks:
+      - navy-net
+
+networks:
+  navy-net:
+    driver: bridge

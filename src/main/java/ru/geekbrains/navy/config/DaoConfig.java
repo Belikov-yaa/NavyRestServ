@@ -14,7 +14,7 @@ public class DaoConfig {
     public DataSource dataSource() {
         final HikariDataSource dataSource = new HikariDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setJdbcUrl("jdbc:postgresql://localhost:5432/postgres");
+        dataSource.setJdbcUrl("jdbc:postgresql://postgres:5432/navy");
         dataSource.setUsername("postgres");
         dataSource.setPassword("postgres");
         return dataSource;
